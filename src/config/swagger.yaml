@@ -1,0 +1,215 @@
+openapi: 3.0.0
+info:
+  title: Film API
+  description: API cho quản lý phim, người dùng và admin.
+  version: "1.0.0"
+  contact:
+    name: Phi Đen
+    email: phiden@example.com
+servers:
+  - url: "http://localhost:3000/api/v1"
+    description: "Local server"
+
+paths:
+  /auth/register:
+    post:
+      summary: Đăng ký người dùng
+      description: Tạo một người dùng mới với thông tin đã cung cấp.
+      operationId: register
+      tags:
+        - Auth
+      requestBody:
+        description: Thông tin người dùng để đăng ký
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "phiden"
+                email:
+                  type: string
+                  example: "phiden@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        "201":
+          description: Đăng ký thành công
+        "400":
+          description: Email đã tồn tại
+        "500":
+          description: Lỗi server
+
+  /auth/login:
+    post:
+      summary: Đăng nhập người dùng
+      description: Đăng nhập và nhận JWT token.
+      operationId: login
+      tags:
+        - Auth
+      requestBody:
+        description: Thông tin đăng nhập
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "phiden@example.com"
+                password:
+                  type: string
+                  example: "password123"
+      responses:
+        "200":
+          description: Đăng nhập thành công, trả về JWT token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                    example: "jwt_token_here"
+        "400":
+          description: Thông tin đăng nhập không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /movies:
+    get:
+      summary: Lấy danh sách tất cả các phim
+      description: Trả về danh sách các phim trong hệ thống.
+      operationId: getMovies
+      tags:
+        - Movie
+      responses:
+        "200":
+          description: Danh sách phim
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    title:
+                      type: string
+                      example: "Avengers"
+                    genre:
+                      type: string
+                      example: "Action"
+                    releaseDate:
+                      type: string
+                      format: date
+                      example: "2021-04-01"
+        "500":
+          description: Lỗi server
+
+  /movies/{id}:
+    get:
+      summary: Lấy thông tin chi tiết một phim
+      description: Trả về thông tin chi tiết của phim theo ID.
+      operationId: getMovieById
+      tags:
+        - Movie
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: ID của phim cần lấy thông tin
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Thông tin chi tiết phim
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    example: "Avengers"
+                  genre:
+                    type: string
+                    example: "Action"
+                  description:
+                    type: string
+                    example: "A movie about superheroes."
+                  releaseDate:
+                    type: string
+                    format: date
+                    example: "2021-04-01"
+        "404":
+          description: Phim không tồn tại
+        "500":
+          description: Lỗi server
+
+  /movies:
+    post:
+      summary: Thêm mới một phim
+      description: Tạo một phim mới với các thông tin được cung cấp.
+      operationId: createMovie
+      tags:
+        - Movie
+      requestBody:
+        description: Thông tin phim để thêm mới
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                title:
+                  type: string
+                  example: "New Movie"
+                description:
+                  type: string
+                  example: "A new movie"
+                genre:
+                  type: string
+                  example: "Drama"
+                releaseDate:
+                  type: string
+                  format: date
+                  example: "2022-06-15"
+                rating:
+                  type: number
+                  format: float
+                  example: 8.5
+      responses:
+        "201":
+          description: Phim đã được tạo thành công
+        "400":
+          description: Dữ liệu không hợp lệ
+        "500":
+          description: Lỗi server
+
+  /admin/dashboard:
+    get:
+      summary: Thống kê tổng quan cho admin
+      description: Hiển thị thông tin tổng quan như số lượng người dùng, số lượng phim, v.v.
+      operationId: getDashboard
+      tags:
+        - Admin
+      responses:
+        "200":
+          description: Thống kê tổng quan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  totalUsers:
+                    type: integer
+                    example: 100
+                  totalMovies:
+                    type: integer
+                    example: 50
+        "500":
+          description: Lỗi server
